@@ -1,0 +1,78 @@
+
+
+## 🔑 **Decrypt Feature Modes**
+
+1. **Bruteforce Mode**
+
+   * Input: one encrypted string.
+   * System: tries all available decryption methods on it (Caesar all shifts, ROT13, Base64, Hex, Atbash, etc.).
+   * Output: list of all results.
+
+2. **Normal Mode**
+
+   * Input: one encrypted string.
+   * User chooses which decryption methods to apply (maybe 1 or multiple).
+   * Output: the results of the chosen methods only.
+
+3. **Find the Real Mode**
+
+   * Input: one encrypted string.
+   * System runs *bruteforce mode*.
+   * Then analyzes outputs → checks which ones look like real text (dictionary, word frequency, language detection).
+   * Suggests the most likely correct result.
+
+---
+
+## 🔒 **Encrypt Feature Modes**
+
+1. **Normal Mode**
+
+   * User chooses one encryption method.
+   * Input string → encrypted once.
+
+2. **Insecurity Mode**
+
+   * User chooses encryption method.
+   * Input string → encrypted multiple times.
+   * Two sub-modes:
+
+     * **Random**: system decides how many times (e.g. 2–10). Then it tells the user “Encrypted 7 times.”
+     * **Told**: user specifies how many times (e.g. 5).
+
+3. **Untrust Mode**
+
+   * Input string → encrypted multiple times but with **different encryption types each time** (e.g., Base64 → Caesar → ROT13 → Hex).
+   * Order can be random or fixed.
+   * Output includes: final ciphertext + the sequence of methods used.
+
+4. **To the Grave Mode**
+
+   * System encrypts string randomly with different methods.
+   * Then generates a **special decryption key** (sequence of methods + parameters like Caesar shift).
+   * Only that key can reverse the process.
+   * Example output:
+
+     ```
+     Ciphertext: X8a9!#0MZ
+     Key: [Base64 → Caesar(shift=5) → ROT13]
+     ```
+   * Without the key, user can’t get back original text.
+
+---
+
+## 🚀 Tech Notes (Implementation Ideas)
+
+* **Language**: Python (best for flexibility, libraries).
+* **Encryption methods you can start with** (simple ones first):
+
+  * Caesar Cipher
+  * ROT13
+  * Atbash Cipher
+  * Base64 encode/decode
+  * Hex encode/decode
+  * (later) Vigenère Cipher
+* **Storage of multiple steps**:
+
+  * For *untrust* and *to\_the\_grave*, keep a **stack/list** of applied methods.
+  * Save that stack as the “key” for decryption.
+
