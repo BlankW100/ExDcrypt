@@ -4,6 +4,7 @@ import base64
 import codecs
 import random
 import string
+import itertools
 
 def Encrypt():
     print("\nEncrypt Modes:")
