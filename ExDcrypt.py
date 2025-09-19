@@ -7,9 +7,22 @@ import string
 import itertools
 import os
 import msvcrt  
+import gzip
+import bz2
 
 # --- Function Definitions ---
 
+def get_string_input():
+    while True:
+        text = input("\nEnter your string: ").strip()
+        if text:
+            return text
+        print("\n\033[91mEmpty input not allowed!\033[0m")
+        print("Press any key to try again...")
+        msvcrt.getch()
+
+
+# --- Encrypt Function ---
 def Encrypt():
     print("\nEncrypt Modes:")
     print("0. Single")
@@ -36,32 +49,49 @@ def Encrypt():
 
             method = input("Enter method number: ").strip()
             if method == "0":
-                
+                text = get_string_input()
                 print("Gzip encryption not implemented yet.")
+                print(f"Text to encrypt: {text}")
                 break
             elif method == "1":
+                text = get_string_input()
                 print("Bzip2 encryption not implemented yet.")
+                print(f"Text to encrypt: {text}")
                 break
             elif method == "2":
-                print("Hex decryption not implemented yet.")
+                text = get_string_input()
+                print("Hex encryption not implemented yet.")
+                print(f"Text to encrypt: {text}")
                 break
             elif method == "3":
-                print("Base64 decryption not implemented yet.")
+                text = get_string_input()
+                print("Base64 encryption not implemented yet.")
+                print(f"Text to encrypt: {text}")
                 break
             elif method == "4":
-                print("Binary decryption not implemented yet.")
+                text = get_string_input()
+                print("Binary encryption not implemented yet.")
+                print(f"Text to encrypt: {text}")
                 break
             elif method == "5":
+                text = get_string_input()
                 print("Morse encryption not implemented yet.")
+                print(f"Text to encrypt: {text}")
                 break
             elif method == "6":
-                print("Ceasar encryption not implemented yet:" )
+                text = get_string_input()
+                print("Caesar encryption not implemented yet.")
+                print(f"Text to encrypt: {text}")
                 break
             elif method == "7":
-                print("Atbash encryption not implemented yet:")
+                text = get_string_input()
+                print("Atbash encryption not implemented yet.")
+                print(f"Text to encrypt: {text}")
                 break
             elif method == "8":
-                print("ROT13 encryption not implemented yet:")
+                text = get_string_input()
+                print("ROT13 encryption not implemented yet.")
+                print(f"Text to encrypt: {text}")
                 break
             elif method == "9":
                 return Encrypt()
@@ -72,6 +102,8 @@ def Encrypt():
     else:
         print("Invalid method selected.")
 
+
+# --- Decrypt Function ---
 def Dcrypt():
     print("\nDecrypt Modes:")
     print("1. Bruteforce (all methods)")
@@ -93,31 +125,49 @@ def Dcrypt():
         while True:
             method = input("Enter method number: ").strip()
             if method == "0":
+                text = get_string_input()
                 print("Gzip decryption not implemented yet.")
+                print(f"Text to decrypt: {text}")
                 break
             elif method == "1":
+                text = get_string_input()
                 print("Bzip2 decryption not implemented yet.")
+                print(f"Text to decrypt: {text}")
                 break
             elif method == "2":
+                text = get_string_input()
                 print("Hex decryption not implemented yet.")
+                print(f"Text to decrypt: {text}")
                 break
             elif method == "3":
+                text = get_string_input()
                 print("Base64 decryption not implemented yet.")
+                print(f"Text to decrypt: {text}")
                 break
             elif method == "4":
+                text = get_string_input()
                 print("Binary decryption not implemented yet.")
+                print(f"Text to decrypt: {text}")
                 break
             elif method == "5":
+                text = get_string_input()
                 print("Morse decryption not implemented yet.")
+                print(f"Text to decrypt: {text}")
                 break
             elif method == "6":
-                print("Caesar decryption not implemented yet:" )
+                text = get_string_input()
+                print("Caesar decryption not implemented yet.")
+                print(f"Text to decrypt: {text}")
                 break
             elif method == "7":
-                print("Atbash decryption not implemented yet:")
+                text = get_string_input()
+                print("Atbash decryption not implemented yet.")
+                print(f"Text to decrypt: {text}")
                 break
             elif method == "8":
-                print("ROT13 decryption not implemented yet:")
+                text = get_string_input()
+                print("ROT13 decryption not implemented yet.")
+                print(f"Text to decrypt: {text}")
                 break
             elif method == "9":
                 return Dcrypt()
