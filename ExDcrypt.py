@@ -9,6 +9,7 @@ import os
 import msvcrt  
 import gzip
 import bz2
+from morse3 import Morse
 
 # --- Function Definitions ---
 
@@ -47,51 +48,73 @@ def Encrypt():
         print("9. Return")
         while True:
 
-            method = input("Enter method number: ").strip()
-            if method == "0":
+            method = input().strip()
+            if method == "0": # Gzip
                 text = get_string_input()
                 print("Gzip encryption not implemented yet.")
                 print(f"Text to encrypt: {text}")
                 break
-            elif method == "1":
+            elif method == "1": # Bzip2
                 text = get_string_input()
                 print("Bzip2 encryption not implemented yet.")
                 print(f"Text to encrypt: {text}")
                 break
-            elif method == "2":
+            elif method == "2": # Hex
                 text = get_string_input()
-                print("Hex encryption not implemented yet.")
+                result = text.encode("utf-8").hex()
+                print(f"Hex encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "3":
+            elif method == "3": # Base64
                 text = get_string_input()
-                print("Base64 encryption not implemented yet.")
+                result = base64.b64encode(text.encode())
                 print(f"Text to encrypt: {text}")
+                print(f"Base64 encryption result: {result}")
+                return_to_menu()
                 break
-            elif method == "4":
+            elif method == "4": # Binary
                 text = get_string_input()
-                print("Binary encryption not implemented yet.")
+                result = " ".join(format(ord(x), '08b') for x in text)
                 print(f"Text to encrypt: {text}")
+                print(f"Binary encryption result: {result}")
+                return_to_menu()
                 break
-            elif method == "5":
+            elif method == "5": # Morse
                 text = get_string_input()
-                print("Morse encryption not implemented yet.")
+                result = Morse().encode(text)
                 print(f"Text to encrypt: {text}")
+                print(f"Morse encryption result: {result}")
+                return_to_menu()
                 break
-            elif method == "6":
+            elif method == "6": # Caesar Cipher
                 text = get_string_input()
-                print("Caesar encryption not implemented yet.")
+                input_key = input("Enter shift key (number): ").strip()
+                if not input_key.isdigit():
+                    print("\n\033[91mInvalid key! Must be a number.\033[0m")
+                    print("Press any key to try again...")
+                    msvcrt.getch()
+                    continue    
+                result = ''.join(chr((ord(char) - 65 + int(input_key)) % 26 + 65) if char.isupper() else
+                                 chr((ord(char) - 97 + int(input_key)) % 26 + 97) if char.islower() else char for char in text)
+                print(f"Caesar Cipher encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "7":
+            elif method == "7": # Atbash Cipher
                 text = get_string_input()
-                print("Atbash encryption not implemented yet.")
+                result = ''.join(chr(155 - ord(char)) if char.isupper() else
+                                 chr(219 - ord(char)) if char.islower() else char for char in text)
+                print(f"Atbash Cipher encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "8":
+            elif method == "8": # ROT13
                 text = get_string_input()
-                print("ROT13 encryption not implemented yet.")
+                result = codecs.encode(text, 'rot_13')
+                print(f"ROT13 encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
             elif method == "9":
                 return Encrypt()
@@ -124,47 +147,47 @@ def Dcrypt():
         print("9. Return")
         while True:
             method = input("Enter method number: ").strip()
-            if method == "0":
+            if method == "0": # Gzip
                 text = get_string_input()
                 print("Gzip decryption not implemented yet.")
                 print(f"Text to decrypt: {text}")
                 break
-            elif method == "1":
+            elif method == "1": # Bzip2
                 text = get_string_input()
                 print("Bzip2 decryption not implemented yet.")
                 print(f"Text to decrypt: {text}")
                 break
-            elif method == "2":
+            elif method == "2": # Hex
                 text = get_string_input()
                 print("Hex decryption not implemented yet.")
                 print(f"Text to decrypt: {text}")
                 break
-            elif method == "3":
+            elif method == "3": # Base64
                 text = get_string_input()
                 print("Base64 decryption not implemented yet.")
                 print(f"Text to decrypt: {text}")
                 break
-            elif method == "4":
+            elif method == "4": # Binary
                 text = get_string_input()
                 print("Binary decryption not implemented yet.")
                 print(f"Text to decrypt: {text}")
                 break
-            elif method == "5":
+            elif method == "5": # Morse
                 text = get_string_input()
                 print("Morse decryption not implemented yet.")
                 print(f"Text to decrypt: {text}")
                 break
-            elif method == "6":
+            elif method == "6": # Caesar Cipher
                 text = get_string_input()
                 print("Caesar decryption not implemented yet.")
                 print(f"Text to decrypt: {text}")
                 break
-            elif method == "7":
+            elif method == "7": # Atbash Cipher
                 text = get_string_input()
                 print("Atbash decryption not implemented yet.")
                 print(f"Text to decrypt: {text}")
                 break
-            elif method == "8":
+            elif method == "8": # ROT13
                 text = get_string_input()
                 print("ROT13 decryption not implemented yet.")
                 print(f"Text to decrypt: {text}")
@@ -188,6 +211,17 @@ def FileAnalyze():
     mode = input().strip()
     
     pass
+
+#prevent shutting down
+def return_to_menu():
+    print("\nPress 'M' to return to main menu or any other key to exit...")
+    key = msvcrt.getch().decode('utf-8').upper()
+    if key == 'M':
+        os.system('cls' if os.name == 'nt' else 'clear')
+        exec(open(__file__, encoding='utf-8').read())
+    else:
+        exit()
+
 
 # --- UI and Main Logic ---
 
