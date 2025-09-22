@@ -51,13 +51,17 @@ def Encrypt():
             method = input().strip()
             if method == "0": # Gzip
                 text = get_string_input()
-                print("Gzip encryption not implemented yet.")
+                result = gzip.compress(text.encode())
+                print(f"Gzip encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
             elif method == "1": # Bzip2
                 text = get_string_input()
-                print("Bzip2 encryption not implemented yet.")
+                result = bz2.compress(text.encode())
+                print(f"Bzip2 encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
             elif method == "2": # Hex
                 text = get_string_input()
