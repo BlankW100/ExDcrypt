@@ -153,48 +153,74 @@ def Dcrypt():
             method = input("Enter method number: ").strip()
             if method == "0": # Gzip
                 text = get_string_input()
-                print("Gzip decryption not implemented yet.")
+                result = gzip.decompress(eval(text)).decode()
+                print(f"Gzip decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
             elif method == "1": # Bzip2
                 text = get_string_input()
-                print("Bzip2 decryption not implemented yet.")
+                result = bz2.decompress(eval(text)).decode()
+                print(f"Bzip2 decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
             elif method == "2": # Hex
                 text = get_string_input()
-                print("Hex decryption not implemented yet.")
+                result = bytes.fromhex(text).decode('utf-8')
+                print(f"Hex decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
             elif method == "3": # Base64
                 text = get_string_input()
-                print("Base64 decryption not implemented yet.")
+                result = base64.b64decode(text).decode()
+                print(f"Base64 decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()    
                 break
             elif method == "4": # Binary
                 text = get_string_input()
-                print("Binary decryption not implemented yet.")
+                result = ''.join(chr(int(b, 2)) for b in text.split())
+                print(f"Binary decryption result: {result}") 
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
             elif method == "5": # Morse
                 text = get_string_input()
-                print("Morse decryption not implemented yet.")
+                result = Morse().decode(text)
+                print(f"Morse decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
             elif method == "6": # Caesar Cipher
                 text = get_string_input()
-                print("Caesar decryption not implemented yet.")
+                input_key = input("Enter shift key (number): ").strip()
+                if not input_key.isdigit():
+                    print("\n\033[91mInvalid key! Must be a number.\033[0m")
+                    print("Press any key to try again...")
+                    msvcrt.getch()
+                    continue    
+                result = ''.join(chr((ord(char) - 65 - int(input_key)) % 26 + 65) if char.isupper() else
+                                 chr((ord(char) - 97 - int(input_key)) % 26 + 97) if char.islower() else char for char in text)
+                print(f"Caesar Cipher decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
             elif method == "7": # Atbash Cipher
                 text = get_string_input()
-                print("Atbash decryption not implemented yet.")
+                result = ''.join(chr(155 - ord(char)) if char.isupper() else
+                                 chr(219 - ord(char)) if char.islower() else char for char in text)
+                print(f"Atbash Cipher decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
             elif method == "8": # ROT13
                 text = get_string_input()
-                print("ROT13 decryption not implemented yet.")
+                result = codecs.decode(text, 'rot_13')
+                print(f"ROT13 decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
             elif method == "9":
                 return Dcrypt()
