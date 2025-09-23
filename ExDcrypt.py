@@ -289,7 +289,7 @@ def Encrypt():
         else:
             print("Invalid method.")
             continue
-        random_times -= 1  # decrement
+        encrypt_times -= 1  # decrement
     print(f"Final encryption result: {result}")   
     print(f"Encrypted times: {initial_times}")
 
