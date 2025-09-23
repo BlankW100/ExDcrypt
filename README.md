@@ -66,7 +66,7 @@ To encrypt a string using Base64:
 - **B1u3**
 
 ## License
-ExDcrypt is open source. You are free to use, modify, and distribute this software, provided that proper credit is given to the author, **B1u3**.
+<a href="https://github.com/BlankW100/ExDcrypt.git">ExDcrypt</a> © 2025 by <a href="https://github.com/BlankW100">Woon Yu Hern (B1u3_)</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;">
 
 ## Notes
 - The `Paranoia` and `Bruteforce` modes are not yet implemented.
