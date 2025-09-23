@@ -9,6 +9,8 @@ import os
 import msvcrt  
 import gzip
 import bz2
+import binascii
+import re
 from morse3 import Morse as m
 
 # --- Function Definitions ---
@@ -517,6 +519,75 @@ def FileAnalyze():
     print("0. Text / String Analysis")
     print("1. File Analysis")
     mode = input().strip()
+
+    if mode == "0":
+        text = get_string_input()
+    print("\n--- String Analysis Results ---")
+
+    # --- Gzip ---
+    try:
+        # Gzip files start with 1F 8B in hex
+        if text.startswith("b'") or text.startswith("b\""):
+            candidate = eval(text)  # try convert b'...' into bytes
+        else:
+            candidate = text.encode()
+
+        if candidate[:2] == b"\x1f\x8b":
+            print("[+] Looks like Gzip compressed data")
+    except Exception:
+        pass
+
+    # --- Bzip2 ---
+    try:
+        if candidate[:3] == b"BZh":
+            print("[+] Looks like Bzip2 compressed data")
+    except Exception:
+        pass
+
+    # --- Hex ---
+    try:
+        if all(c in "0123456789abcdefABCDEF" for c in text) and len(text) % 2 == 0:
+            binascii.unhexlify(text)
+            print("[+] Looks like Hex encoding")
+    except Exception:
+        pass
+
+    # --- Base64 ---
+    try:
+        if re.fullmatch(r"[A-Za-z0-9+/=]+", text) and len(text) % 4 == 0:
+            base64.b64decode(text)
+            print("[+] Looks like Base64 encoding")
+    except Exception:
+        pass
+
+    # --- Binary ---
+    if all(c in "01 " for c in text) and len(text.replace(" ", "")) % 8 == 0:
+        print("[+] Looks like Binary encoding (8-bit ASCII)")
+
+    # --- Morse ---
+    if all(c in ".-/ " for c in text) and "." in text or "-" in text:
+        print("[+] Looks like Morse code")
+
+    # --- Caesar Cipher Guess ---
+    if text.isalpha() and text.isupper() or text.islower():
+        print("[?] Could be Caesar Cipher (shifted text)")
+
+    # --- Atbash ---
+    if text.isalpha():
+        print("[?] Could be Atbash Cipher (mirrored alphabet)")
+
+    # --- ROT13 ---
+    try:
+        rot = codecs.encode(text, "rot_13")
+        # If decoding still looks like readable text, it's ROT13
+        if rot.isalpha():
+            print("[?] Could be ROT13")
+    except Exception:
+        pass
+
+    print("\n--- Analysis Complete ---")
+
+
     
     pass
 
