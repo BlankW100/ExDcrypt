@@ -129,6 +129,92 @@ def Encrypt():
     else:
         print("Invalid method selected.")
 
+# mode 1
+    if mode == "1":
+        minvalue = int(input("Enter minimum times to encrypt: ").strip())
+        if minvalue < 1:
+            print("The minvalue must be at least 1")
+            return_to_menu()
+
+        maxvalue = int(input("Enter maximum times to encrypt: ").strip())
+        random_times = random.randint(minvalue, maxvalue)
+        initial_random_times = random_times
+
+    
+    text = get_string_input() 
+    result = text
+
+    print("\nSelect encryption method:")
+    print("0. Gzip")
+    print("1. Bzip2")
+    print("2. HeX")
+    print("3. Base64")
+    print("4. Binary")
+    print("5. Morse")
+    print("6. Caesar Cipher")
+    print("7. Atbash Cipher")
+    print("8. ROT13")
+    print("9. Return")
+    method = input("Choose method: ").strip()
+    while random_times > 0:
+        
+        if method == "0":  # Gzip
+            result = gzip.compress(result.encode() if isinstance(result, str) else result)
+
+        elif method == "1":  # Bzip2
+            result = bz2.compress(result.encode() if isinstance(result, str) else result)
+
+        elif method == "2":  # Hex
+            result = result.encode("utf-8").hex() if isinstance(result, str) else result.hex()
+
+        elif method == "3":  # Base64
+            result = base64.b64encode(result.encode() if isinstance(result, str) else result)
+
+        elif method == "4":  # Binary
+            if isinstance(result, bytes): result = result.decode(errors="ignore")
+            result = " ".join(format(ord(x), '08b') for x in result)
+
+        elif method == "5":  # Morse
+            if isinstance(result, bytes): result = result.decode(errors="ignore")
+            result = Morse().encode(result)
+
+        elif method == "6":  # Caesar Cipher
+            if isinstance(result, bytes): result = result.decode(errors="ignore")
+            input_key = input("Enter shift key (number): ").strip()
+            if not input_key.isdigit():
+                print("Invalid key! Must be a number.")
+                continue
+            key = int(input_key)
+            result = ''.join(
+                chr((ord(char) - 65 + key) % 26 + 65) if char.isupper() else
+                chr((ord(char) - 97 + key) % 26 + 97) if char.islower() else char
+                for char in result
+            )
+
+        elif method == "7":  # Atbash Cipher
+            if isinstance(result, bytes): result = result.decode(errors="ignore")
+            result = ''.join(
+                chr(155 - ord(char)) if char.isupper() else
+                chr(219 - ord(char)) if char.islower() else char
+                for char in result
+            )
+
+        elif method == "8":  # ROT13
+            if isinstance(result, bytes): result = result.decode(errors="ignore")
+            result = codecs.encode(result, 'rot_13')
+
+        elif method == "9":
+            return Encrypt()
+
+        else:
+            print("Invalid method.")
+            continue
+
+        random_times -= 1  # decrement
+    print(f"Final encryption result: {result}")   
+    print(f"Encrypted times: {initial_random_times}")
+
+            
 
 # --- Decrypt Function ---
 def Dcrypt():
