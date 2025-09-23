@@ -11,7 +11,7 @@ import gzip
 import bz2
 import binascii
 import re
-from morse3 import Morse as m
+from morse3 import Morse as m   
 
 # --- Function Definitions ---
 
