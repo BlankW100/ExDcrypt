@@ -9,6 +9,7 @@ import os
 import msvcrt  
 import gzip
 import bz2
+from morse3 import Morse as m
 
 # --- Function Definitions ---
 
@@ -30,9 +31,11 @@ def Encrypt():
     print("2. Insecurity (Told times)")
     print("3. Untrust (Different methods)")
     print("4. Paranoia (All methods)")
+    print("5. Return")
 
     mode = input().strip()
-    
+
+    # --- MODE 0: Single Encryption ---
     if mode == "0":
         print("\nSelect encryption method:")
         print("0. Gzip")
@@ -47,51 +50,77 @@ def Encrypt():
         print("9. Return")
         while True:
 
-            method = input("Enter method number: ").strip()
-            if method == "0":
+            method = input().strip()
+            if method == "0": # Gzip
                 text = get_string_input()
-                print("Gzip encryption not implemented yet.")
+                result = gzip.compress(text.encode())
+                print(f"Gzip encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "1":
+            elif method == "1": # Bzip2
                 text = get_string_input()
-                print("Bzip2 encryption not implemented yet.")
+                result = bz2.compress(text.encode())
+                print(f"Bzip2 encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "2":
+            elif method == "2": # Hex
                 text = get_string_input()
-                print("Hex encryption not implemented yet.")
+                result = text.encode("utf-8").hex()
+                print(f"Hex encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "3":
+            elif method == "3": # Base64
                 text = get_string_input()
-                print("Base64 encryption not implemented yet.")
+                result = base64.b64encode(text.encode())
                 print(f"Text to encrypt: {text}")
+                print(f"Base64 encryption result: {result}")
+                return_to_menu()
                 break
-            elif method == "4":
+            elif method == "4": # Binary
                 text = get_string_input()
-                print("Binary encryption not implemented yet.")
+                result = " ".join(format(ord(x), '08b') for x in text)
                 print(f"Text to encrypt: {text}")
+                print(f"Binary encryption result: {result}")
+                return_to_menu()
                 break
-            elif method == "5":
+            elif method == "5": # Morse
                 text = get_string_input()
-                print("Morse encryption not implemented yet.")
+                result = m(text).stringToMorse()  
                 print(f"Text to encrypt: {text}")
+                print(f"Morse encryption result: {result}")
+                return_to_menu()
                 break
-            elif method == "6":
+            elif method == "6": # Caesar Cipher
                 text = get_string_input()
-                print("Caesar encryption not implemented yet.")
+                input_key = input("Enter shift key (number): ").strip()
+                if not input_key.isdigit():
+                    print("\n\033[91mInvalid key! Must be a number.\033[0m")
+                    print("Press any key to try again...")
+                    msvcrt.getch()
+                    continue    
+                result = ''.join(chr((ord(char) - 65 + int(input_key)) % 26 + 65) if char.isupper() else
+                                 chr((ord(char) - 97 + int(input_key)) % 26 + 97) if char.islower() else char for char in text)
+                print(f"Caesar Cipher encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "7":
+            elif method == "7": # Atbash Cipher
                 text = get_string_input()
-                print("Atbash encryption not implemented yet.")
+                result = ''.join(chr(155 - ord(char)) if char.isupper() else
+                                 chr(219 - ord(char)) if char.islower() else char for char in text)
+                print(f"Atbash Cipher encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "8":
+            elif method == "8": # ROT13
                 text = get_string_input()
-                print("ROT13 encryption not implemented yet.")
+                result = codecs.encode(text, 'rot_13')
+                print(f"ROT13 encryption result: {result}")
                 print(f"Text to encrypt: {text}")
+                return_to_menu()
                 break
             elif method == "9":
                 return Encrypt()
@@ -99,9 +128,285 @@ def Encrypt():
                 print("\n\033[1;91m" + "*" * 30)
                 print("        INVALID")
                 print("*" * 30 + "\033[0m\n")
-    else:
-        print("Invalid method selected.")
 
+# --- MODE 1: Self Insecurity (Random times) ---
+    elif mode == "1":
+        try:
+            minvalue = int(input("Enter minimum times to encrypt: ").strip())
+            if minvalue < 1:
+                print("The minvalue must be at least 1")
+                return_to_menu()
+                return
+
+            maxvalue = int(input("Enter maximum times to encrypt: ").strip())
+            random_times = random.randint(minvalue, maxvalue)
+            initial_random_times = random_times
+
+            text = get_string_input()
+            result = text
+
+            print("\nSelect encryption method:")
+            print("0. Gzip")
+            print("1. Bzip2")
+            print("2. HeX")
+            print("3. Base64")
+            print("4. Binary")
+            print("5. Morse")
+            print("6. Caesar Cipher")
+            print("7. Atbash Cipher")
+            print("8. ROT13")
+            print("9. Return")
+            method = input("Choose method: ").strip()
+            
+            while random_times > 0:
+        
+                if method == "0":  # Gzip
+                    result = gzip.compress(result.encode() if isinstance(result, str) else result)
+
+                elif method == "1":  # Bzip2
+                    result = bz2.compress(result.encode() if isinstance(result, str) else result)
+
+                elif method == "2":  # Hex
+                    result = result.encode("utf-8").hex() if isinstance(result, str) else result.hex()
+
+                elif method == "3":  # Base64
+                    result = base64.b64encode(result.encode() if isinstance(result, str) else result)
+
+                elif method == "4":  # Binary
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = " ".join(format(ord(x), '08b') for x in result)
+
+                elif method == "5":  # Morse
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = m(text).stringToMorse()  
+
+                elif method == "6":  # Caesar Cipher
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    input_key = input("Enter shift key (number): ").strip()
+                    if not input_key.isdigit():
+                        print("Invalid key! Must be a number.")
+                        continue
+                    key = int(input_key)
+                    result = ''.join(
+                        chr((ord(char) - 65 + key) % 26 + 65) if char.isupper() else
+                        chr((ord(char) - 97 + key) % 26 + 97) if char.islower() else char
+                        for char in result
+                    )
+
+                elif method == "7":  # Atbash Cipher
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = ''.join(
+                        chr(155 - ord(char)) if char.isupper() else
+                        chr(219 - ord(char)) if char.islower() else char
+                        for char in result
+                    )
+
+                elif method == "8":  # ROT13
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = codecs.encode(result, 'rot_13')
+
+                elif method == "9":
+                    return Encrypt()
+
+                else:
+                    print("Invalid method.")
+                    continue
+
+                random_times -= 1  # decrement
+            print(f"Final encryption result: {result}")   
+            print(f"Encrypted times: {initial_random_times}")
+            return_to_menu()
+
+        except ValueError:
+            print("\n\033[91mPlease enter valid numbers!\033[0m")
+            return_to_menu()
+
+    # --- MODE 2: Insecurity (Told times) ---
+    elif mode == "2":
+        try:
+            encrypt_times = int(input("Enter amount of times to encrypt: ").strip())
+            initial_times = encrypt_times
+
+            text = get_string_input() 
+            result = text
+
+            print("\nSelect encryption method:")
+            print("0. Gzip")
+            print("1. Bzip2")
+            print("2. HeX")
+            print("3. Base64")
+            print("4. Binary")
+            print("5. Morse")
+            print("6. Caesar Cipher")
+            print("7. Atbash Cipher")
+            print("8. ROT13")
+            print("9. Return")
+            method = input("Choose method: ").strip()
+
+            while encrypt_times > 0:
+        
+
+                if method == "0":  # Gzip
+                    result = gzip.compress(result.encode() if isinstance(result, str) else result)
+
+                elif method == "1":  # Bzip2
+                    result = bz2.compress(result.encode() if isinstance(result, str) else result)
+
+                elif method == "2":  # Hex
+                    result = result.encode("utf-8").hex() if isinstance(result, str) else result.hex()
+
+                elif method == "3":  # Base64
+                    result = base64.b64encode(result.encode() if isinstance(result, str) else result)
+
+                elif method == "4":  # Binary
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = " ".join(format(ord(x), '08b') for x in result)
+
+                elif method == "5":  # Morse
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = m(text).stringToMorse()  
+
+                elif method == "6":  # Caesar Cipher
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    input_key = input("Enter shift key (number): ").strip()
+                    if not input_key.isdigit():
+                        print("Invalid key! Must be a number.")
+                        continue
+                    key = int(input_key)
+                    result = ''.join(
+                        chr((ord(char) - 65 + key) % 26 + 65) if char.isupper() else
+                        chr((ord(char) - 97 + key) % 26 + 97) if char.islower() else char
+                        for char in result
+                    )
+
+                elif method == "7":  # Atbash Cipher
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = ''.join(
+                        chr(155 - ord(char)) if char.isupper() else
+                        chr(219 - ord(char)) if char.islower() else char
+                        for char in result
+                    )
+
+                elif method == "8":  # ROT13
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = codecs.encode(result, 'rot_13')
+
+                elif method == "9":
+                    return Encrypt()
+
+                else:
+                    print("Invalid method.")
+                    continue
+                encrypt_times -= 1  # decrement
+            print(f"Final encryption result: {result}")   
+            print(f"Encrypted times: {initial_times}")
+            return_to_menu()
+
+        except ValueError:
+            print("\n\033[91mPlease enter a valid number!\033[0m")
+            return_to_menu()
+
+    # --- MODE 3: Untrust (Different methods) ---
+    elif mode == "3":
+        try:
+            method_value = int(input("How many methods do you want to apply: ").strip())
+            initial_value = method_value
+
+            text = get_string_input() 
+            result = text
+
+            print("\nSelect encryption method:")
+            print("0. Gzip")
+            print("1. Bzip2")
+            print("2. HeX")
+            print("3. Base64")
+            print("4. Binary")
+            print("5. Morse")
+            print("6. Caesar Cipher")
+            print("7. Atbash Cipher")
+            print("8. ROT13")
+            print("9. Return")
+    
+
+            while method_value > 0:
+
+                method = input("Choose method: ").strip()
+
+                if method == "0":  # Gzip
+                    result = gzip.compress(result.encode() if isinstance(result, str) else result)
+
+                elif method == "1":  # Bzip2
+                    result = bz2.compress(result.encode() if isinstance(result, str) else result)
+
+                elif method == "2":  # Hex
+                    result = result.encode("utf-8").hex() if isinstance(result, str) else result.hex()
+
+                elif method == "3":  # Base64
+                    result = base64.b64encode(result.encode() if isinstance(result, str) else result)
+
+                elif method == "4":  # Binary
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = " ".join(format(ord(x), '08b') for x in result)
+
+                elif method == "5":  # Morse
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = m(text).stringToMorse()
+
+                elif method == "6":  # Caesar Cipher
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    input_key = input("Enter shift key (number): ").strip()
+                    if not input_key.isdigit():
+                        print("Invalid key! Must be a number.")
+                        continue
+                    key = int(input_key)
+                    result = ''.join(
+                        chr((ord(char) - 65 + key) % 26 + 65) if char.isupper() else
+                        chr((ord(char) - 97 + key) % 26 + 97) if char.islower() else char
+                        for char in result
+                    )
+
+                elif method == "7":  # Atbash Cipher
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = ''.join(
+                        chr(155 - ord(char)) if char.isupper() else
+                        chr(219 - ord(char)) if char.islower() else char
+                        for char in result
+                    )
+
+                elif method == "8":  # ROT13
+                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    result = codecs.encode(result, 'rot_13')
+
+                elif method == "9":
+                    return Encrypt()
+
+                else:
+                    print("Invalid method.")
+                    continue
+                method_value -= 1  # decrement
+            print(f"Final encryption result: {result}")
+            print(f"Methods applied: {initial_value}")
+            return_to_menu()
+
+        except ValueError:
+            print("\n\033[91mPlease enter a valid number!\033[0m")
+            return_to_menu()
+
+    # --- MODE 4: Paranoia (All methods) ---
+    elif mode == "4":
+        print("Paranoia mode not implemented yet")
+        return_to_menu()
+
+    # --- Return to Main Menu ---
+    elif mode == "5":
+        os.system('cls' if os.name == 'nt' else 'clear')
+        exec(open(__file__, encoding='utf-8').read())
+
+    else:
+        print("\n\033[1;91m" + "*" * 30)
+        print("        INVALID MODE")
+        print("*" * 30 + "\033[0m\n")
+        return_to_menu()
 
 # --- Decrypt Function ---
 def Dcrypt():
@@ -124,50 +429,76 @@ def Dcrypt():
         print("9. Return")
         while True:
             method = input("Enter method number: ").strip()
-            if method == "0":
+            if method == "0": # Gzip
                 text = get_string_input()
-                print("Gzip decryption not implemented yet.")
+                result = gzip.decompress(eval(text)).decode()
+                print(f"Gzip decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "1":
+            elif method == "1": # Bzip2
                 text = get_string_input()
-                print("Bzip2 decryption not implemented yet.")
+                result = bz2.decompress(eval(text)).decode()
+                print(f"Bzip2 decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "2":
+            elif method == "2": # Hex
                 text = get_string_input()
-                print("Hex decryption not implemented yet.")
+                result = bytes.fromhex(text).decode('utf-8')
+                print(f"Hex decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "3":
+            elif method == "3": # Base64
                 text = get_string_input()
-                print("Base64 decryption not implemented yet.")
+                result = base64.b64decode(text).decode()
+                print(f"Base64 decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()    
                 break
-            elif method == "4":
+            elif method == "4": # Binary
                 text = get_string_input()
-                print("Binary decryption not implemented yet.")
+                result = ''.join(chr(int(b, 2)) for b in text.split())
+                print(f"Binary decryption result: {result}") 
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "5":
+            elif method == "5": # Morse
                 text = get_string_input()
-                print("Morse decryption not implemented yet.")
+                result = m(text)
+                print(f"Morse decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "6":
+            elif method == "6": # Caesar Cipher
                 text = get_string_input()
-                print("Caesar decryption not implemented yet.")
+                input_key = input("Enter shift key (number): ").strip()
+                if not input_key.isdigit():
+                    print("\n\033[91mInvalid key! Must be a number.\033[0m")
+                    print("Press any key to try again...")
+                    msvcrt.getch()
+                    continue    
+                result = ''.join(chr((ord(char) - 65 - int(input_key)) % 26 + 65) if char.isupper() else
+                                 chr((ord(char) - 97 - int(input_key)) % 26 + 97) if char.islower() else char for char in text)
+                print(f"Caesar Cipher decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "7":
+            elif method == "7": # Atbash Cipher
                 text = get_string_input()
-                print("Atbash decryption not implemented yet.")
+                result = ''.join(chr(155 - ord(char)) if char.isupper() else
+                                 chr(219 - ord(char)) if char.islower() else char for char in text)
+                print(f"Atbash Cipher decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
-            elif method == "8":
+            elif method == "8": # ROT13
                 text = get_string_input()
-                print("ROT13 decryption not implemented yet.")
+                result = codecs.decode(text, 'rot_13')
+                print(f"ROT13 decryption result: {result}")
                 print(f"Text to decrypt: {text}")
+                return_to_menu()
                 break
             elif method == "9":
                 return Dcrypt()
@@ -188,6 +519,17 @@ def FileAnalyze():
     mode = input().strip()
     
     pass
+
+#prevent shutting down
+def return_to_menu():
+    print("\nPress 'M' to return to main menu or any other key to exit...")
+    key = msvcrt.getch().decode('utf-8').upper()
+    if key == 'M':
+        os.system('cls' if os.name == 'nt' else 'clear')
+        exec(open(__file__, encoding='utf-8').read())
+    else:
+        exit()
+
 
 # --- UI and Main Logic ---
 
