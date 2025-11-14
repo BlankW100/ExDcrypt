@@ -461,11 +461,35 @@ def Dcrypt():
                 break
             elif method == "4": # Binary
                 text = get_string_input()
-                result = ''.join(chr(int(b, 2)) for b in text.split())
-                print(f"Binary decryption result: {result}") 
-                print(f"Text to decrypt: {text}")
-                return_to_menu()
-                break
+                try:
+                    # Validate binary input
+                    chunks = text.split()
+                    if not all(set(chunk) <= {'0', '1'} for chunk in chunks):
+                        raise ValueError("Invalid binary format - use only 0s and 1s")
+        
+                    # Check each chunk is 8 bits
+                    if not all(len(chunk) == 8 for chunk in chunks):
+                        raise ValueError("Each binary chunk must be 8 bits")
+            
+                    # Convert and validate character codes
+                    result = ''
+                    for chunk in chunks:
+                        value = int(chunk, 2)
+                        if value > 0x10FFFF:  # Maximum Unicode value
+                            raise ValueError(f"Invalid character code: {value}")
+                        result += chr(value)
+            
+                    print(f"Binary decryption result: {result}")
+                    print(f"Text to decrypt: {text}")
+                    return_to_menu()
+                    break
+        
+                except ValueError as e:
+                    print(f"\n\033[91mError: {e}\033[0m")
+                    print("Make sure input is valid 8-bit binary (e.g. '01101000 01101001')")
+                    print("Press any key to try again...")
+                    msvcrt.getch()
+                    continue
             elif method == "5": # Morse
                 text = get_string_input()
                 result = m(text)
@@ -510,7 +534,10 @@ def Dcrypt():
                 print("*" * 30 + "\033[0m\n")
 
     elif mode == "1":
-        print("Bruteforce mode not implemented yet.")
+        text = get_string_input()
+        result_gzip = bytes.fromhex(text).decode('utf-8')
+        result_bzip2 = bz2.decompress(eval(text)).decode()
+        result_hex = bytes.fromhex(text).decode('utf-8')
     else:
         print("Invalid method selected.")
 
