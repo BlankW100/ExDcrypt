@@ -189,15 +189,15 @@ def Encrypt():
                     result = base64.b64encode(result.encode() if isinstance(result, str) else result)
 
                 elif method == "4":  # Binary
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = " ".join(format(ord(x), '08b') for x in result)
 
                 elif method == "5":  # Morse
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = str(m(result).stringToMorse())
 
                 elif method == "6":  # Caesar Cipher
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = ''.join(
                         chr((ord(char) - 65 + caesar_key) % 26 + 65) if char.isupper() else
                         chr((ord(char) - 97 + caesar_key) % 26 + 97) if char.islower() else char
@@ -205,7 +205,7 @@ def Encrypt():
                     )
 
                 elif method == "7":  # Atbash Cipher
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = ''.join(
                         chr(155 - ord(char)) if char.isupper() else
                         chr(219 - ord(char)) if char.islower() else char
@@ -281,15 +281,15 @@ def Encrypt():
                     result = base64.b64encode(result.encode() if isinstance(result, str) else result)
 
                 elif method == "4":  # Binary
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = " ".join(format(ord(x), '08b') for x in result)
 
                 elif method == "5":  # Morse
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = str(m(result).stringToMorse())
 
                 elif method == "6":  # Caesar Cipher
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = ''.join(
                         chr((ord(char) - 65 + caesar_key) % 26 + 65) if char.isupper() else
                         chr((ord(char) - 97 + caesar_key) % 26 + 97) if char.islower() else char
@@ -297,7 +297,7 @@ def Encrypt():
                     )
 
                 elif method == "7":  # Atbash Cipher
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = ''.join(
                         chr(155 - ord(char)) if char.isupper() else
                         chr(219 - ord(char)) if char.islower() else char
@@ -365,15 +365,15 @@ def Encrypt():
                     result = base64.b64encode(result.encode() if isinstance(result, str) else result)
 
                 elif method == "4":  # Binary
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = " ".join(format(ord(x), '08b') for x in result)
 
                 elif method == "5":  # Morse
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = str(m(result).stringToMorse())
 
                 elif method == "6":  # Caesar Cipher
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     input_key = input("Enter shift key (number): ").strip()
                     if not input_key.isdigit():
                         print("Invalid key! Must be a number.")
@@ -386,7 +386,7 @@ def Encrypt():
                     )
 
                 elif method == "7":  # Atbash Cipher
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
+                    if not isinstance(result, str): result = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
                     result = ''.join(
                         chr(155 - ord(char)) if char.isupper() else
                         chr(219 - ord(char)) if char.islower() else char
