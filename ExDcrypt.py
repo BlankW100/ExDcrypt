@@ -11,6 +11,7 @@ import gzip
 import bz2
 import binascii
 import re
+import ast
 from morse3 import Morse as m
 
 # --- Function Definitions ---
@@ -125,7 +126,7 @@ def Encrypt():
                 return_to_menu()
                 break
             elif method == "9":
-                return Encrypt()
+                return
             else:
                 print("\n\033[1;91m" + "*" * 30)
                 print("        INVALID")
@@ -180,7 +181,7 @@ def Encrypt():
 
                 elif method == "5":  # Morse
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    result = m(text).stringToMorse()  
+                    result = m(result).stringToMorse()
 
                 elif method == "6":  # Caesar Cipher
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
@@ -204,11 +205,14 @@ def Encrypt():
                     )
 
                 elif method == "8":  # ROT13
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    result = codecs.encode(result, 'rot_13')
+                    s = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
+                    result = s.translate(str.maketrans(
+                        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                        'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
+                    ))
 
                 elif method == "9":
-                    return Encrypt()
+                    return
 
                 else:
                     print("Invalid method.")
@@ -266,7 +270,7 @@ def Encrypt():
 
                 elif method == "5":  # Morse
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    result = m(text).stringToMorse()  
+                    result = m(result).stringToMorse()
 
                 elif method == "6":  # Caesar Cipher
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
@@ -290,11 +294,14 @@ def Encrypt():
                     )
 
                 elif method == "8":  # ROT13
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    result = codecs.encode(result, 'rot_13')
+                    s = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
+                    result = s.translate(str.maketrans(
+                        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                        'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
+                    ))
 
                 elif method == "9":
-                    return Encrypt()
+                    return
 
                 else:
                     print("Invalid method.")
@@ -376,11 +383,14 @@ def Encrypt():
                     )
 
                 elif method == "8":  # ROT13
-                    if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    result = codecs.encode(result, 'rot_13')
+                    s = result.decode(errors="ignore") if isinstance(result, bytes) else str(result)
+                    result = s.translate(str.maketrans(
+                        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                        'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
+                    ))
 
                 elif method == "9":
-                    return Encrypt()
+                    return
 
                 else:
                     print("Invalid method.")
@@ -401,8 +411,7 @@ def Encrypt():
 
     # --- Return to Main Menu ---
     elif mode == "5":
-        os.system('cls' if os.name == 'nt' else 'clear')
-        exec(open(__file__, encoding='utf-8').read())
+        return
 
     else:
         print("\n\033[1;91m" + "*" * 30)
@@ -433,14 +442,26 @@ def Dcrypt():
             method = input("Enter method number: ").strip()
             if method == "0": # Gzip
                 text = get_string_input()
-                result = gzip.decompress(eval(text)).decode()
-                print(f"Gzip decryption result: {result}")
-                print(f"Text to decrypt: {text}")
-                return_to_menu()
-                break
+                try:
+                    result = gzip.decompress(ast.literal_eval(text)).decode()
+                    print(f"Gzip decryption result: {result}")
+                    print(f"Text to decrypt: {text}")
+                    return_to_menu()
+                    break
+                except Exception as e:
+                    print(f"\n\033[91mError: {e}\033[0m")
+                    print("Paste the exact bytes output from encryption (e.g. b'\\x1f\\x8b...')")
+                    msvcrt.getch()
+                    continue
             elif method == "1": # Bzip2
                 text = get_string_input()
-                result = bz2.decompress(eval(text)).decode()
+                try:
+                    result = bz2.decompress(ast.literal_eval(text)).decode()
+                except Exception as e:
+                    print(f"\n\033[91mError: {e}\033[0m")
+                    print("Paste the exact bytes output from encryption (e.g. b'BZh...')")
+                    msvcrt.getch()
+                    continue
                 print(f"Bzip2 decryption result: {result}")
                 print(f"Text to decrypt: {text}")
                 return_to_menu()
@@ -492,7 +513,7 @@ def Dcrypt():
                     continue
             elif method == "5": # Morse
                 text = get_string_input()
-                result = m(text)
+                result = m(text).morseToString()
                 print(f"Morse decryption result: {result}")
                 print(f"Text to decrypt: {text}")
                 return_to_menu()
@@ -527,7 +548,7 @@ def Dcrypt():
                 return_to_menu()
                 break
             elif method == "9":
-                return Dcrypt()
+                return
             else:
                 print("\n\033[1;91m" + "*" * 30)
                 print("        INVALID")
@@ -535,9 +556,22 @@ def Dcrypt():
 
     elif mode == "1":
         text = get_string_input()
-        result_gzip = bytes.fromhex(text).decode('utf-8')
-        result_bzip2 = bz2.decompress(eval(text)).decode()
-        result_hex = bytes.fromhex(text).decode('utf-8')
+        try:
+            result_bzip2 = bz2.decompress(ast.literal_eval(text)).decode()
+            print(f"Bzip2 bruteforce result: {result_bzip2}")
+        except Exception:
+            pass
+        try:
+            result_hex = bytes.fromhex(text).decode('utf-8')
+            print(f"Hex bruteforce result: {result_hex}")
+        except Exception:
+            pass
+        try:
+            result_b64 = base64.b64decode(text).decode()
+            print(f"Base64 bruteforce result: {result_b64}")
+        except Exception:
+            pass
+        return_to_menu()
     else:
         print("Invalid method selected.")
 
@@ -555,7 +589,7 @@ def FileAnalyze():
     try:
         # Gzip files start with 1F 8B in hex
         if text.startswith("b'") or text.startswith("b\""):
-            candidate = eval(text)  # try convert b'...' into bytes
+            candidate = ast.literal_eval(text)
         else:
             candidate = text.encode()
 
@@ -592,11 +626,11 @@ def FileAnalyze():
         print("[+] Looks like Binary encoding (8-bit ASCII)")
 
     # --- Morse ---
-    if all(c in ".-/ " for c in text) and "." in text or "-" in text:
+    if all(c in ".-/ " for c in text) and ("." in text or "-" in text):
         print("[+] Looks like Morse code")
 
     # --- Caesar Cipher Guess ---
-    if text.isalpha() and text.isupper() or text.islower():
+    if text.isalpha() and (text.isupper() or text.islower()):
         print("[?] Could be Caesar Cipher (shifted text)")
 
     # --- Atbash ---
@@ -605,8 +639,10 @@ def FileAnalyze():
 
     # --- ROT13 ---
     try:
-        rot = codecs.encode(text, "rot_13")
-        # If decoding still looks like readable text, it's ROT13
+        rot = text.translate(str.maketrans(
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+            'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
+        ))
         if rot.isalpha():
             print("[?] Could be ROT13")
     except Exception:
@@ -618,46 +654,47 @@ def FileAnalyze():
     
     pass
 
-#prevent shutting down
+class _ReturnToMenu(Exception):
+    pass
+
 def return_to_menu():
     print("\nPress 'M' to return to main menu or any other key to exit...")
     key = msvcrt.getch().decode('utf-8').upper()
     if key == 'M':
-        os.system('cls' if os.name == 'nt' else 'clear')
-        exec(open(__file__, encoding='utf-8').read())
+        raise _ReturnToMenu()
     else:
         exit()
 
+def main():
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        ascii_banner = pyfiglet.figlet_format("ExDcrypt")
+        print(ascii_banner)
+        print("Welcome to ExDcrypt, by: [    B1u3    ]")
+        print("\nChoose your mode:")
+        print("0. Encrypt")
+        print("1. Dcrypt")
+        print("2. File Analyze")
+        print("3. How this works??")
 
-# --- UI and Main Logic ---
+        choice = input().strip()
+        try:
+            if choice == "0":
+                Encrypt()
+            elif choice == "1":
+                Dcrypt()
+            elif choice == "2":
+                FileAnalyze()
+            elif choice == "3":
+                print("\nHow this works??\n")
+                print("This tool provides encryption, decryption, and file analysis modes.")
+                print("Choose a mode and follow the prompts to use the features.")
+                print("\nPress any key to return...")
+                msvcrt.getch()
+            else:
+                print("Bruh choos a valid option or just alt + f4")
+        except _ReturnToMenu:
+            continue
 
-ascii_banner = pyfiglet.figlet_format("ExDcrypt")
-print(ascii_banner)
-print("Welcome to ExDcrypt, by: [    B1u3    ]")
-
-print("\nChoose your mode:")
-print("0. Encrypt")
-print("1. Dcrypt")
-print("2. File Analyze")
-print("3. How this works??")
-
-choice = input().strip()
-
-if choice == "0":
-    Encrypt()
-elif choice == "1":
-    Dcrypt()
-elif choice == "2":
-    FileAnalyze()
-elif choice == "3":
-    print("\nHow this works??\n")
-    print("This tool provides encryption, decryption, and file analysis modes.")
-    print("Choose a mode and follow the prompts to use the features.")
-    print("\nPress any key to return...")
-    msvcrt.getch()
-   
-    os.system('cls' if os.name == 'nt' else 'clear')
-    exec(open(__file__, encoding='utf-8').read())
-
-else:
-    print("Bruh choos a valid option or just alt + f4")
+if __name__ == "__main__":
+    main()
