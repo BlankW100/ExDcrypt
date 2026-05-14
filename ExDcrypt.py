@@ -707,9 +707,14 @@ def FileAnalyze():
         except Exception:
             pass
 
+        # --- Binary (checked first to suppress false Hex/Base64 matches) ---
+        is_binary = all(c in "01 " for c in text) and len(text.replace(" ", "")) % 8 == 0
+        if is_binary:
+            print("[+] Looks like Binary encoding (8-bit ASCII)")
+
         # --- Hex ---
         try:
-            if all(c in "0123456789abcdefABCDEF" for c in text) and len(text) % 2 == 0:
+            if not is_binary and all(c in "0123456789abcdefABCDEF" for c in text) and len(text) % 2 == 0:
                 binascii.unhexlify(text)
                 print("[+] Looks like Hex encoding")
         except Exception:
@@ -717,22 +722,18 @@ def FileAnalyze():
 
         # --- Base64 ---
         try:
-            if re.fullmatch(r"[A-Za-z0-9+/=]+", text) and len(text) % 4 == 0:
+            if not is_binary and re.fullmatch(r"[A-Za-z0-9+/=]+", text) and len(text) % 4 == 0:
                 base64.b64decode(text)
                 print("[+] Looks like Base64 encoding")
         except Exception:
             pass
-
-        # --- Binary ---
-        if all(c in "01 " for c in text) and len(text.replace(" ", "")) % 8 == 0:
-            print("[+] Looks like Binary encoding (8-bit ASCII)")
 
         # --- Morse ---
         if all(c in ".-/ " for c in text) and ("." in text or "-" in text):
             print("[+] Looks like Morse code")
 
         # --- Caesar Cipher Guess ---
-        if text.isalpha() and (text.isupper() or text.islower()):
+        if text.isalpha():
             print("[?] Could be Caesar Cipher (shifted text)")
 
         # --- Atbash ---
