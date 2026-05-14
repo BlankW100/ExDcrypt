@@ -581,21 +581,98 @@ def Dcrypt():
 
     elif mode == "1":
         text = get_string_input()
+        print("\n--- Bruteforce Decrypt Results ---")
+        found = False
+
+        # Gzip
         try:
-            result_bzip2 = bz2.decompress(ast.literal_eval(text)).decode()
-            print(f"Bzip2 bruteforce result: {result_bzip2}")
+            r = gzip.decompress(ast.literal_eval(text)).decode()
+            print(f"[Gzip]          {text}  ->  {r}")
+            found = True
         except Exception:
             pass
+
+        # Bzip2
         try:
-            result_hex = bytes.fromhex(text).decode('utf-8')
-            print(f"Hex bruteforce result: {result_hex}")
+            r = bz2.decompress(ast.literal_eval(text)).decode()
+            print(f"[Bzip2]         {text}  ->  {r}")
+            found = True
         except Exception:
             pass
+
+        # Hex
         try:
-            result_b64 = base64.b64decode(text).decode()
-            print(f"Base64 bruteforce result: {result_b64}")
+            r = bytes.fromhex(text).decode('utf-8')
+            print(f"[Hex]           {text}  ->  {r}")
+            found = True
         except Exception:
             pass
+
+        # Base64
+        try:
+            r = base64.b64decode(text).decode()
+            print(f"[Base64]        {text}  ->  {r}")
+            found = True
+        except Exception:
+            pass
+
+        # Binary
+        try:
+            chunks = text.split()
+            if chunks and all(set(c) <= {'0', '1'} for c in chunks) and all(len(c) == 8 for c in chunks):
+                r = ''.join(chr(int(c, 2)) for c in chunks)
+                print(f"[Binary]        {text}  ->  {r}")
+                found = True
+        except Exception:
+            pass
+
+        # Morse
+        try:
+            r = m(text).morseToString()
+            print(f"[Morse]         {text}  ->  {r}")
+            found = True
+        except Exception:
+            pass
+
+        # Caesar - all 25 shifts
+        for shift in range(1, 26):
+            try:
+                r = ''.join(
+                    chr((ord(c) - 65 - shift) % 26 + 65) if c.isupper() else
+                    chr((ord(c) - 97 - shift) % 26 + 97) if c.islower() else c
+                    for c in text
+                )
+                print(f"[Caesar shift={shift:2d}]  {text}  ->  {r}")
+                found = True
+            except Exception:
+                pass
+
+        # Atbash
+        try:
+            r = ''.join(
+                chr(155 - ord(c)) if c.isupper() else
+                chr(219 - ord(c)) if c.islower() else c
+                for c in text
+            )
+            print(f"[Atbash]        {text}  ->  {r}")
+            found = True
+        except Exception:
+            pass
+
+        # ROT13
+        try:
+            r = text.translate(str.maketrans(
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
+            ))
+            print(f"[ROT13]         {text}  ->  {r}")
+            found = True
+        except Exception:
+            pass
+
+        if not found:
+            print("No successful decryption found.")
+        print("\n--- Done ---")
         return_to_menu()
     else:
         print("Invalid method selected.")
