@@ -142,6 +142,10 @@ def Encrypt():
                 return
 
             maxvalue = int(input("Enter maximum times to encrypt: ").strip())
+            if maxvalue < minvalue:
+                print("\n\033[91mMax value must be greater than or equal to min value!\033[0m")
+                return_to_menu()
+                return
             random_times = random.randint(minvalue, maxvalue)
             initial_random_times = random_times
 
@@ -359,7 +363,7 @@ def Encrypt():
 
                 elif method == "5":  # Morse
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    result = m(text).stringToMorse()
+                    result = m(result).stringToMorse()
 
                 elif method == "6":  # Caesar Cipher
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
@@ -468,18 +472,32 @@ def Dcrypt():
                 break
             elif method == "2": # Hex
                 text = get_string_input()
-                result = bytes.fromhex(text).decode('utf-8')
-                print(f"Hex decryption result: {result}")
-                print(f"Text to decrypt: {text}")
-                return_to_menu()
-                break
+                try:
+                    result = bytes.fromhex(text).decode('utf-8')
+                    print(f"Hex decryption result: {result}")
+                    print(f"Text to decrypt: {text}")
+                    return_to_menu()
+                    break
+                except Exception as e:
+                    print(f"\n\033[91mError: {e}\033[0m")
+                    print("Make sure input is valid hex (e.g. '48656c6c6f')")
+                    print("Press any key to try again...")
+                    msvcrt.getch()
+                    continue
             elif method == "3": # Base64
                 text = get_string_input()
-                result = base64.b64decode(text).decode()
-                print(f"Base64 decryption result: {result}")
-                print(f"Text to decrypt: {text}")
-                return_to_menu()    
-                break
+                try:
+                    result = base64.b64decode(text).decode()
+                    print(f"Base64 decryption result: {result}")
+                    print(f"Text to decrypt: {text}")
+                    return_to_menu()
+                    break
+                except Exception as e:
+                    print(f"\n\033[91mError: {e}\033[0m")
+                    print("Make sure input is valid Base64 (e.g. 'SGVsbG8=')")
+                    print("Press any key to try again...")
+                    msvcrt.getch()
+                    continue
             elif method == "4": # Binary
                 text = get_string_input()
                 try:
@@ -583,76 +601,82 @@ def FileAnalyze():
 
     if mode == "0":
         text = get_string_input()
-    print("\n--- String Analysis Results ---")
+        print("\n--- String Analysis Results ---")
 
-    # --- Gzip ---
-    try:
-        # Gzip files start with 1F 8B in hex
-        if text.startswith("b'") or text.startswith("b\""):
-            candidate = ast.literal_eval(text)
-        else:
-            candidate = text.encode()
+        # --- Gzip ---
+        candidate = b""
+        try:
+            if text.startswith("b'") or text.startswith("b\""):
+                candidate = ast.literal_eval(text)
+            else:
+                candidate = text.encode()
 
-        if candidate[:2] == b"\x1f\x8b":
-            print("[+] Looks like Gzip compressed data")
-    except Exception:
-        pass
+            if candidate[:2] == b"\x1f\x8b":
+                print("[+] Looks like Gzip compressed data")
+        except Exception:
+            pass
 
-    # --- Bzip2 ---
-    try:
-        if candidate[:3] == b"BZh":
-            print("[+] Looks like Bzip2 compressed data")
-    except Exception:
-        pass
+        # --- Bzip2 ---
+        try:
+            if candidate[:3] == b"BZh":
+                print("[+] Looks like Bzip2 compressed data")
+        except Exception:
+            pass
 
-    # --- Hex ---
-    try:
-        if all(c in "0123456789abcdefABCDEF" for c in text) and len(text) % 2 == 0:
-            binascii.unhexlify(text)
-            print("[+] Looks like Hex encoding")
-    except Exception:
-        pass
+        # --- Hex ---
+        try:
+            if all(c in "0123456789abcdefABCDEF" for c in text) and len(text) % 2 == 0:
+                binascii.unhexlify(text)
+                print("[+] Looks like Hex encoding")
+        except Exception:
+            pass
 
-    # --- Base64 ---
-    try:
-        if re.fullmatch(r"[A-Za-z0-9+/=]+", text) and len(text) % 4 == 0:
-            base64.b64decode(text)
-            print("[+] Looks like Base64 encoding")
-    except Exception:
-        pass
+        # --- Base64 ---
+        try:
+            if re.fullmatch(r"[A-Za-z0-9+/=]+", text) and len(text) % 4 == 0:
+                base64.b64decode(text)
+                print("[+] Looks like Base64 encoding")
+        except Exception:
+            pass
 
-    # --- Binary ---
-    if all(c in "01 " for c in text) and len(text.replace(" ", "")) % 8 == 0:
-        print("[+] Looks like Binary encoding (8-bit ASCII)")
+        # --- Binary ---
+        if all(c in "01 " for c in text) and len(text.replace(" ", "")) % 8 == 0:
+            print("[+] Looks like Binary encoding (8-bit ASCII)")
 
-    # --- Morse ---
-    if all(c in ".-/ " for c in text) and ("." in text or "-" in text):
-        print("[+] Looks like Morse code")
+        # --- Morse ---
+        if all(c in ".-/ " for c in text) and ("." in text or "-" in text):
+            print("[+] Looks like Morse code")
 
-    # --- Caesar Cipher Guess ---
-    if text.isalpha() and (text.isupper() or text.islower()):
-        print("[?] Could be Caesar Cipher (shifted text)")
+        # --- Caesar Cipher Guess ---
+        if text.isalpha() and (text.isupper() or text.islower()):
+            print("[?] Could be Caesar Cipher (shifted text)")
 
-    # --- Atbash ---
-    if text.isalpha():
-        print("[?] Could be Atbash Cipher (mirrored alphabet)")
+        # --- Atbash ---
+        if text.isalpha():
+            print("[?] Could be Atbash Cipher (mirrored alphabet)")
 
-    # --- ROT13 ---
-    try:
-        rot = text.translate(str.maketrans(
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-            'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
-        ))
-        if rot.isalpha():
-            print("[?] Could be ROT13")
-    except Exception:
-        pass
+        # --- ROT13 ---
+        try:
+            rot = text.translate(str.maketrans(
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+                'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
+            ))
+            if rot.isalpha():
+                print("[?] Could be ROT13")
+        except Exception:
+            pass
 
-    print("\n--- Analysis Complete ---")
+        print("\n--- Analysis Complete ---")
+        return_to_menu()
 
+    elif mode == "1":
+        print("File Analysis not implemented yet")
+        return_to_menu()
 
-    
-    pass
+    else:
+        print("\n\033[1;91m" + "*" * 30)
+        print("        INVALID MODE")
+        print("*" * 30 + "\033[0m\n")
 
 class _ReturnToMenu(Exception):
     pass
