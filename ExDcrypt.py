@@ -165,7 +165,7 @@ def Encrypt():
             print("9. Return")
             method = input("Choose method: ").strip()
 
-            caesar_key = None
+            caesar_key = 0
             if method == "6":
                 while True:
                     input_key = input("Enter shift key (number): ").strip()
@@ -194,7 +194,7 @@ def Encrypt():
 
                 elif method == "5":  # Morse
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    result = m(result).stringToMorse()
+                    result = str(m(result).stringToMorse())
 
                 elif method == "6":  # Caesar Cipher
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
@@ -257,7 +257,7 @@ def Encrypt():
             print("9. Return")
             method = input("Choose method: ").strip()
 
-            caesar_key = None
+            caesar_key = 0
             if method == "6":
                 while True:
                     input_key = input("Enter shift key (number): ").strip()
@@ -286,7 +286,7 @@ def Encrypt():
 
                 elif method == "5":  # Morse
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    result = m(result).stringToMorse()
+                    result = str(m(result).stringToMorse())
 
                 elif method == "6":  # Caesar Cipher
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
@@ -370,7 +370,7 @@ def Encrypt():
 
                 elif method == "5":  # Morse
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    result = m(result).stringToMorse()
+                    result = str(m(result).stringToMorse())
 
                 elif method == "6":  # Caesar Cipher
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
