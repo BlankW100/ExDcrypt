@@ -12,6 +12,8 @@ import bz2
 import binascii
 import re
 import ast
+import tkinter as tk
+from tkinter import filedialog
 from morse3 import Morse as m
 
 # --- Function Definitions ---
@@ -677,6 +679,74 @@ def Dcrypt():
     else:
         print("Invalid method selected.")
 
+def _analyze_content(text: str) -> None:
+    candidate = b""
+    try:
+        if text.startswith("b'") or text.startswith("b\""):
+            candidate = ast.literal_eval(text)
+        else:
+            candidate = text.encode()
+        if candidate[:2] == b"\x1f\x8b":
+            print("[+] Looks like Gzip compressed data")
+    except Exception:
+        pass
+
+    try:
+        if candidate[:3] == b"BZh":
+            print("[+] Looks like Bzip2 compressed data")
+    except Exception:
+        pass
+
+    is_binary = all(c in "01 " for c in text) and len(text.replace(" ", "")) % 8 == 0
+    if is_binary:
+        print("[+] Looks like Binary encoding (8-bit ASCII)")
+
+    try:
+        if not is_binary and all(c in "0123456789abcdefABCDEF" for c in text) and len(text) % 2 == 0:
+            binascii.unhexlify(text)
+            print("[+] Looks like Hex encoding")
+    except Exception:
+        pass
+
+    try:
+        if not is_binary and re.fullmatch(r"[A-Za-z0-9+/=]+", text) and len(text) % 4 == 0:
+            base64.b64decode(text)
+            print("[+] Looks like Base64 encoding")
+    except Exception:
+        pass
+
+    if all(c in ".-/ " for c in text) and ("." in text or "-" in text):
+        print("[+] Looks like Morse code")
+
+    if text.isalpha():
+        print("[?] Could be Caesar Cipher (shifted text)")
+        print("[?] Could be Atbash Cipher (mirrored alphabet)")
+
+    try:
+        rot = text.translate(str.maketrans(
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+            'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
+        ))
+        if rot.isalpha():
+            print("[?] Could be ROT13")
+    except Exception:
+        pass
+
+
+_FILE_MAGIC = [
+    (b"\x1f\x8b",           "[+] Gzip compressed file"),
+    (b"BZh",                "[+] Bzip2 compressed file"),
+    (b"PK\x03\x04",         "[+] ZIP archive"),
+    (b"\x89PNG\r\n\x1a\n",  "[+] PNG image"),
+    (b"%PDF",               "[+] PDF document"),
+    (b"MZ",                 "[+] Windows PE executable"),
+    (b"\xff\xd8\xff",       "[+] JPEG image"),
+    (b"GIF87a",             "[+] GIF image (87a)"),
+    (b"GIF89a",             "[+] GIF image (89a)"),
+    (b"7z\xbc\xaf\x27\x1c", "[+] 7-Zip archive"),
+]
+
+
 def FileAnalyze():
     print("\nFile Analysis Modes:")
     print("0. Text / String Analysis")
@@ -686,76 +756,73 @@ def FileAnalyze():
     if mode == "0":
         text = get_string_input()
         print("\n--- String Analysis Results ---")
-
-        # --- Gzip ---
-        candidate = b""
-        try:
-            if text.startswith("b'") or text.startswith("b\""):
-                candidate = ast.literal_eval(text)
-            else:
-                candidate = text.encode()
-
-            if candidate[:2] == b"\x1f\x8b":
-                print("[+] Looks like Gzip compressed data")
-        except Exception:
-            pass
-
-        # --- Bzip2 ---
-        try:
-            if candidate[:3] == b"BZh":
-                print("[+] Looks like Bzip2 compressed data")
-        except Exception:
-            pass
-
-        # --- Binary (checked first to suppress false Hex/Base64 matches) ---
-        is_binary = all(c in "01 " for c in text) and len(text.replace(" ", "")) % 8 == 0
-        if is_binary:
-            print("[+] Looks like Binary encoding (8-bit ASCII)")
-
-        # --- Hex ---
-        try:
-            if not is_binary and all(c in "0123456789abcdefABCDEF" for c in text) and len(text) % 2 == 0:
-                binascii.unhexlify(text)
-                print("[+] Looks like Hex encoding")
-        except Exception:
-            pass
-
-        # --- Base64 ---
-        try:
-            if not is_binary and re.fullmatch(r"[A-Za-z0-9+/=]+", text) and len(text) % 4 == 0:
-                base64.b64decode(text)
-                print("[+] Looks like Base64 encoding")
-        except Exception:
-            pass
-
-        # --- Morse ---
-        if all(c in ".-/ " for c in text) and ("." in text or "-" in text):
-            print("[+] Looks like Morse code")
-
-        # --- Caesar Cipher Guess ---
-        if text.isalpha():
-            print("[?] Could be Caesar Cipher (shifted text)")
-
-        # --- Atbash ---
-        if text.isalpha():
-            print("[?] Could be Atbash Cipher (mirrored alphabet)")
-
-        # --- ROT13 ---
-        try:
-            rot = text.translate(str.maketrans(
-                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-                'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
-            ))
-            if rot.isalpha():
-                print("[?] Could be ROT13")
-        except Exception:
-            pass
-
+        _analyze_content(text)
         print("\n--- Analysis Complete ---")
         return_to_menu()
 
     elif mode == "1":
-        print("File Analysis not implemented yet")
+        root = tk.Tk()
+        root.withdraw()
+        path = filedialog.askopenfilename(title="Select a file to analyze")
+        root.destroy()
+
+        if not path:
+            print("\nNo file selected.")
+            return_to_menu()
+            return
+
+        print(f"\n--- File Analysis Results ---")
+        print(f"[i] File : {os.path.basename(path)}")
+
+        try:
+            size = os.path.getsize(path)
+            if size < 1024:
+                size_str = f"{size} B"
+            elif size < 1024 * 1024:
+                size_str = f"{size / 1024:.1f} KB"
+            else:
+                size_str = f"{size / (1024 * 1024):.1f} MB"
+            print(f"[i] Size : {size_str}")
+        except Exception:
+            pass
+
+        try:
+            with open(path, "rb") as f:
+                raw = f.read()
+        except Exception as e:
+            print(f"[!] Could not read file: {e}")
+            return_to_menu()
+            return
+
+        # --- Magic byte detection ---
+        matched_magic = False
+        for magic, label in _FILE_MAGIC:
+            if raw.startswith(magic):
+                print(label)
+                matched_magic = True
+                break
+
+        # --- Binary vs text (null bytes = binary) ---
+        is_file_binary = b"\x00" in raw[:8192]
+        if not matched_magic:
+            print("[i] Appears to be a " + ("binary" if is_file_binary else "text") + " file")
+
+        # --- Text encoding detection and content analysis ---
+        if not is_file_binary:
+            text_content = None
+            for enc in ("utf-8", "utf-16", "latin-1"):
+                try:
+                    text_content = raw.decode(enc)
+                    print(f"[i] Encoding: {enc.upper()}")
+                    break
+                except (UnicodeDecodeError, ValueError):
+                    continue
+
+            if text_content:
+                print("\n--- Content Analysis ---")
+                _analyze_content(text_content.strip())
+
+        print("\n--- Analysis Complete ---")
         return_to_menu()
 
     else:
