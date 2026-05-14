@@ -164,9 +164,18 @@ def Encrypt():
             print("8. ROT13")
             print("9. Return")
             method = input("Choose method: ").strip()
-            
+
+            caesar_key = None
+            if method == "6":
+                while True:
+                    input_key = input("Enter shift key (number): ").strip()
+                    if input_key.isdigit():
+                        caesar_key = int(input_key)
+                        break
+                    print("Invalid key! Must be a number.")
+
             while random_times > 0:
-        
+
                 if method == "0":  # Gzip
                     result = gzip.compress(result.encode() if isinstance(result, str) else result)
 
@@ -189,14 +198,9 @@ def Encrypt():
 
                 elif method == "6":  # Caesar Cipher
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    input_key = input("Enter shift key (number): ").strip()
-                    if not input_key.isdigit():
-                        print("Invalid key! Must be a number.")
-                        continue
-                    key = int(input_key)
                     result = ''.join(
-                        chr((ord(char) - 65 + key) % 26 + 65) if char.isupper() else
-                        chr((ord(char) - 97 + key) % 26 + 97) if char.islower() else char
+                        chr((ord(char) - 65 + caesar_key) % 26 + 65) if char.isupper() else
+                        chr((ord(char) - 97 + caesar_key) % 26 + 97) if char.islower() else char
                         for char in result
                     )
 
@@ -253,8 +257,16 @@ def Encrypt():
             print("9. Return")
             method = input("Choose method: ").strip()
 
+            caesar_key = None
+            if method == "6":
+                while True:
+                    input_key = input("Enter shift key (number): ").strip()
+                    if input_key.isdigit():
+                        caesar_key = int(input_key)
+                        break
+                    print("Invalid key! Must be a number.")
+
             while encrypt_times > 0:
-        
 
                 if method == "0":  # Gzip
                     result = gzip.compress(result.encode() if isinstance(result, str) else result)
@@ -278,14 +290,9 @@ def Encrypt():
 
                 elif method == "6":  # Caesar Cipher
                     if isinstance(result, bytes): result = result.decode(errors="ignore")
-                    input_key = input("Enter shift key (number): ").strip()
-                    if not input_key.isdigit():
-                        print("Invalid key! Must be a number.")
-                        continue
-                    key = int(input_key)
                     result = ''.join(
-                        chr((ord(char) - 65 + key) % 26 + 65) if char.isupper() else
-                        chr((ord(char) - 97 + key) % 26 + 97) if char.islower() else char
+                        chr((ord(char) - 65 + caesar_key) % 26 + 65) if char.isupper() else
+                        chr((ord(char) - 97 + caesar_key) % 26 + 97) if char.islower() else char
                         for char in result
                     )
 
@@ -683,7 +690,11 @@ class _ReturnToMenu(Exception):
 
 def return_to_menu():
     print("\nPress 'M' to return to main menu or any other key to exit...")
-    key = msvcrt.getch().decode('utf-8').upper()
+    raw = msvcrt.getch()
+    try:
+        key = raw.decode('utf-8').upper()
+    except UnicodeDecodeError:
+        key = ''
     if key == 'M':
         raise _ReturnToMenu()
     else:
@@ -700,6 +711,7 @@ def main():
         print("1. Dcrypt")
         print("2. File Analyze")
         print("3. How this works??")
+        print("4. Exit")
 
         choice = input().strip()
         try:
@@ -715,6 +727,8 @@ def main():
                 print("Choose a mode and follow the prompts to use the features.")
                 print("\nPress any key to return...")
                 msvcrt.getch()
+            elif choice == "4":
+                exit()
             else:
                 print("Bruh choos a valid option or just alt + f4")
         except _ReturnToMenu:
